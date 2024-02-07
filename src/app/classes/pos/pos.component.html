@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="receipt">
+        <h2 class="receiptHeader">Transaction #{{basket.receiptNumber}}</h2>
+        <p class="receiptHeader">Today: {{basket.date | date}}</p>
+        <div class="scannedItems">
+            <ul>
+                <li *ngFor="let scannedItem of basket.lineItems; let i = index">{{scannedItem.items[i].name}}</li>
+            </ul>
+        </div>
+        <p class="receiptFooter">Sub-Total:-----${{subTotal}}</p>
+        <p class="receiptFooter">Sales Tax of 7%:-----${{taxApplied}}</p>
+        <p class="receiptFooter">Total:-----${{total}}</p>
+        <button (click)="clearBasket()">Clear All</button>
+    </div>
+    <div class="buttons">
+        <div class="itemButtons">
+            <button *ngFor="let item of pricebook" class="itemButton" (click)="addItem(item)">{{item.name}}</button>
+        </div>
+        <div class="navButtons">
+            <button class="navButton" (click)="prev()">Prev</button>
+            <button class="navButton" (click)="next()">Next</button>
+        </div>
+    </div>
+</div>
