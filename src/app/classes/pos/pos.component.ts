@@ -36,9 +36,8 @@ export class PosComponent implements OnInit {
   total: number = 0;
   displayedItems: number = 20;
   startingItems: number = 0;
-
-  public fullPricebookArray: any = [];
-  public pricebook: Item[] = [];
+  fullPricebookArray: any = [];
+  pricebook: Item[] = [];
 
   constructor(private http: HttpClient){
   }
