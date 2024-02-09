@@ -1,7 +1,7 @@
 import { Item } from "./item";
 
 export interface LineItem {
-    items: Item[];
+    item: Item;
     quantity: number;
     voided: boolean;
 }

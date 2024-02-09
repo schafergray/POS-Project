@@ -1,16 +1,30 @@
 <div class="container">
     <div class="receipt">
-        <h2 class="receiptHeader">Transaction #{{basket.receiptNumber}}</h2>
-        <p class="receiptHeader">Today: {{basket.date | date}}</p>
-        <div class="scannedItems">
-            <ul>
-                <li *ngFor="let scannedItem of basket.lineItems; let i = index">{{scannedItem.items[i].name}}</li>
-            </ul>
+        <div class="header">
+            <h2 class="receiptHeader">Transaction #{{basket.receiptNumber}}</h2>
+            <p class="receiptHeader">Today: {{basket.date | date}}</p>
+            <input type="text" #barcodeInput (keydown.enter)="handleBarcodeInput($event);barcodeInput.value = ''" class="scannerInput" autofocus />
         </div>
-        <p class="receiptFooter">Sub-Total:-----${{subTotal}}</p>
-        <p class="receiptFooter">Sales Tax of 7%:-----${{taxApplied}}</p>
-        <p class="receiptFooter">Total:-----${{total}}</p>
-        <button (click)="clearBasket()">Clear All</button>
+        <div class="body">
+            <div class="scannedItems">
+                <ul>
+                    <li *ngFor="let lineItem of basket.lineItems; let i = index" (click)="captureItemData(lineItem)" class="lineItem">
+                        <s *ngIf="basket.lineItems[i].voided === true; else notVoided">{{basket.lineItems[i].quantity}}-----{{lineItem.item.name}}</s>
+                        <ng-template #notVoided>{{basket.lineItems[i].quantity}}-----{{lineItem.item.name}}</ng-template>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            <p class="receiptFooter">Sub-Total:-----------${{subTotal}}</p>
+            <p class="receiptFooter">Sales Tax of 7%:-----${{taxApplied}}</p>
+            <br />
+            <p class="receiptFooter">Total:---------------${{total}}</p>
+            <button (click)="clearBasket()" class="receiptFooter">Clear All</button>
+            <button *ngIf="shouldVoid" (click)="voidLineItem()" class="receiptFooter">Void Line Item</button>
+            <button *ngIf="this.basket.lineItems.length > 0" (click)="voidBasket()" class="receiptFooter">Void Basket</button>
+
+        </div>
     </div>
     <div class="buttons">
         <div class="itemButtons">
