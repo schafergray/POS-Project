@@ -130,7 +130,7 @@ export class PosComponent implements OnInit {
   }
 
   public parseCSV(): Observable<String> {
-    return this.http.get('assets/pricebook.csv', {responseType: 'text'})
+    return this.http.get('assets/pricebook.tsv', {responseType: 'text'})
   }
 
   public getLocation(lat: number, long: number) {
