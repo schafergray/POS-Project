@@ -37,8 +37,8 @@
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.6);
     transition: 0.3s;
     background-color: white;
-    max-height: 50vh;
-    min-height: 70vh;
+    max-height: 60vh;
+    min-height: 60vh;
     overflow-y: scroll;
 }
 
@@ -71,6 +71,11 @@
 
 .receiptFooter {
     margin: 1px;
+}
+
+.checkoutFooter {
+    margin: 1px;
+    text-align: right;
 }
 
 .itemButtons {
@@ -130,6 +135,11 @@
     cursor: pointer;
 }
 
+.lineItemActive {
+    background-color: rgb(212, 212, 212);
+    border-radius: 10px;
+}
+
 .lineItem:hover {
     background-color: rgb(212, 212, 212);
     border-radius: 10px;
@@ -137,4 +147,8 @@
 
 .scannerInput {
     opacity: 0;
+}
+
+ul {
+    list-style-type:none;
 }

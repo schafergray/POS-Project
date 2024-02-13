@@ -2,14 +2,17 @@
     <div class="receipt">
         <div class="header">
             <h2 class="receiptHeader">Transaction #{{basket.receiptNumber}}</h2>
-            <p class="receiptHeader">Today: {{basket.date | date}}</p>
+            <h3 class="receiptHeader">Today: {{basket.date | date}}</h3>
+            <p class="receiptHeader">Location: {{basket.location}}</p>
+            <p class="receiptHeader">Cashier: {{basket.cashierName}}</p>
+            <p class="receiptHeader">Cashier ID: {{basket.cashierId}}</p>
             <input type="text" #barcodeInput (keydown.enter)="handleBarcodeInput($event);barcodeInput.value = ''" class="scannerInput" autofocus />
         </div>
         <div class="body">
             <div class="scannedItems">
                 <ul>
                     <li *ngFor="let lineItem of basket.lineItems; let i = index" (click)="captureItemData(lineItem)" class="lineItem">
-                        <s *ngIf="basket.lineItems[i].voided === true; else notVoided">{{basket.lineItems[i].quantity}}-----{{lineItem.item.name}}</s>
+                        <input type="radio" name="radioButton" /><s *ngIf="basket.lineItems[i].voided === true; else notVoided">{{basket.lineItems[i].quantity}}-----{{lineItem.item.name}}</s>
                         <ng-template #notVoided>{{basket.lineItems[i].quantity}}-----{{lineItem.item.name}}</ng-template>
                     </li>
                 </ul>
@@ -21,8 +24,11 @@
             <br />
             <p class="receiptFooter">Total:---------------${{total}}</p>
             <button (click)="clearBasket()" class="receiptFooter">Clear All</button>
-            <button *ngIf="shouldVoid" (click)="voidLineItem()" class="receiptFooter">Void Line Item</button>
-            <button *ngIf="this.basket.lineItems.length > 0" (click)="voidBasket()" class="receiptFooter">Void Basket</button>
+            <button *ngIf="shouldVoid" (click)="voidLineItem()" class="receiptFooter">Void Item</button>
+            <button *ngIf="this.basket.lineItems.length > 0 && this.basket.voided === false" (click)="voidBasket()" class="receiptFooter">Void Basket</button>
+            <button (click)="tender('cash')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true)">Cash</button>
+            <button (click)="tender('credit')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true)">Credit</button>
+            
 
         </div>
     </div>

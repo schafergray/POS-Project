@@ -1,10 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Item } from '../../models/item';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { VirtualJournalServiceService } from '../../services/virtual-journal-service.service';
 
 @Component({
   selector: 'app-pos',
@@ -15,43 +16,81 @@ import { Observable } from 'rxjs';
 })
 export class PosComponent implements OnInit {
   @ViewChild('barcodeInput') barcodeInput!: ElementRef;
-  barcode: any;
-  count: number = 0;
+  @HostListener('window:focus', ['$event'])
+  onFocus(event: FocusEvent): void {
+    this.barcodeInput.nativeElement.focus();
+  }
+  @HostListener('window:keydown.enter', ['$event'])
+  handleBarcodeInput(event: any) {
+    this.barcode = event.target.value;
+    this.pricebook.forEach((item: Item) => {
+      if (item.code === this.barcode) {
+        this.addItem(item);
+      }
+    })
+  }
+
+  barcode!: number;
   shouldVoid: boolean = false;
   toBeVoided: any;
+
   lineItem: LineItem[]= [];
   basket: Basket = {
     receiptNumber: 0,
-    cashierName: '',
-    cashierId: 0,
+    cashierName: 'Ned Stark',
+    cashierId: 1234,
     date: new Date(),
     location: '',
     voided: false,
-    lineItems: this.lineItem,
+    lineItems: this.lineItem
   };
+
   basketStart: boolean = false;
   basketEnd: boolean = true;
+
   subTotal: number = 0;
   taxApplied: number = 0;
   total: number = 0;
+
   displayedItems: number = 20;
   startingItems: number = 0;
+
   fullPricebookArray: any = [];
   pricebook: Item[] = [];
 
-  constructor(private http: HttpClient){
+  constructor (
+    private http: HttpClient,
+    private virtualJournalService: VirtualJournalServiceService
+    ) {
   }
 
   ngOnInit(): void {
     this.getCurrentPosition().subscribe({
       next: (position) => {
-        console.log('Latitude:', position.coords.latitude);
-        console.log('Longitude:', position.coords.longitude);
+        this.getLocation(position.coords.latitude, position.coords.longitude).subscribe({
+          next: (location: any) => {
+            this.basket.location = location.address.Address + ', ' + location.address.City + ', ' + location.address.RegionAbbr;
+            this.virtualJournalService.onEvent({
+              basketStarted: true,
+              cashierName: this.basket.cashierName,
+              cashierId: this.basket.cashierId,
+              location: this.basket.location,
+              date: this.basket.date,
+              receiptNumber: 0,
+            });
+
+            this.barcodeInput.nativeElement.focus();
+          },
+          error: (error) => {
+            console.error('Something has gone wrong.', error)
+          }
+        })
       },
       error: (error) => {
         console.error('Error getting geolocation:', error);
       },
     });
+
     this.parseCSV().subscribe({
       next: (data: any) => {
         let csvToRowArray = data.split("\n");
@@ -66,15 +105,7 @@ export class PosComponent implements OnInit {
         for (let i=this.startingItems; i<this.displayedItems; i++) {
           this.pricebook.push(this.fullPricebookArray[i])
         }
-      }
-    })
-  }
-
-  public handleBarcodeInput(event: any) {
-    this.barcode = event.target.value;
-    this.pricebook.forEach((item: Item) => {
-      if (item.code === this.barcode) {
-        this.addItem(item);
+        this.barcodeInput.nativeElement.focus();
       }
     })
   }
@@ -102,20 +133,32 @@ export class PosComponent implements OnInit {
     return this.http.get('assets/pricebook.csv', {responseType: 'text'})
   }
 
-  public accessDB() {
-    let db;
-    const request = indexedDB.open("POSDatabase");
-    request.onerror = (event) => {
-      console.error("Cannot access IndexedDB at this time!");
-    };
-    request.onsuccess = (event: any) => {
-      db = event.target.result;
-    };
+  public getLocation(lat: number, long: number) {
+    return this.http.get(`https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=${long},${lat}&f=json&token=AAPKd10bd6c383f04daabce9229c43e4cc577pQBOei4DowBmyCCfqfHXpUOu2meH0f63dVIRNMzG1ylva7sMxs8Tu7ZBlu1eT1U`, {responseType: 'json'});
   }
 
   public addItem(item: Item) {
     if (this.basket.lineItems.length === 0) {
       this.basketStarted();
+      this.virtualJournalService.onEvent({
+        basketStarted: this.basketStart,
+        itemAdded: item,
+        cashierName: this.basket.cashierName,
+        cashierId: this.basket.cashierId,
+        location: this.basket.location,
+        date: new Date(),
+        receiptNumber: this.basket.receiptNumber
+      });
+      this.lineItem.push({
+        item: item,
+        quantity: 1,
+        voided: false
+      });
+      this.subTotal = Number((this.subTotal + item.price).toFixed(2));
+      this.taxApplied = Number((this.subTotal * 0.07).toFixed(2));
+      this.total = Number((this.subTotal + this.taxApplied).toFixed(2));
+      this.barcodeInput.nativeElement.focus();
+      return;
     };
     this.lineItem.push({
       item: item,
@@ -140,6 +183,14 @@ export class PosComponent implements OnInit {
     this.subTotal = Number((this.subTotal + item.price).toFixed(2));
     this.taxApplied = Number((this.subTotal * 0.07).toFixed(2));
     this.total = Number((this.subTotal + this.taxApplied).toFixed(2));
+    this.virtualJournalService.onEvent({
+      itemAdded: item,
+      cashierName: this.basket.cashierName,
+      cashierId: this.basket.cashierId,
+      location: this.basket.location,
+      date: new Date(),
+      receiptNumber: this.basket.receiptNumber
+    });
     this.barcodeInput.nativeElement.focus();
   }
 
@@ -147,16 +198,24 @@ export class PosComponent implements OnInit {
     this.lineItem = [];
     this.basket = {
       receiptNumber: this.basket.receiptNumber,
-      cashierName: '',
-      cashierId: 0,
+      cashierName: 'Ned Stark',
+      cashierId: 1234,
       date: new Date(),
-      location: '',
+      location: this.basket.location,
       voided: false,
       lineItems: this.lineItem
     }
     this.subTotal = 0;
     this.taxApplied = 0;
     this.total = 0;
+    this.virtualJournalService.onEvent({
+      basketCleared: true,
+      cashierName: this.basket.cashierName,
+      cashierId: this.basket.cashierId,
+      location: this.basket.location,
+      date: new Date(),
+      receiptNumber: this.basket.receiptNumber
+    });
     this.barcodeInput.nativeElement.focus();
   }
 
@@ -176,6 +235,14 @@ export class PosComponent implements OnInit {
     this.taxApplied = Number((this.subTotal * 0.07).toFixed(2));
     this.total = Number((this.subTotal + this.taxApplied).toFixed(2));
     this.shouldVoid = false;
+    this.virtualJournalService.onEvent({
+      lineItemVoided: this.toBeVoided,
+      cashierName: this.basket.cashierName,
+      cashierId: this.basket.cashierId,
+      location: this.basket.location,
+      date: new Date(),
+      receiptNumber: this.basket.receiptNumber
+    });
     this.barcodeInput.nativeElement.focus();
   }
 
@@ -185,14 +252,39 @@ export class PosComponent implements OnInit {
       lineItem.quantity = 0;
       lineItem.voided = true;
     })
+    console.log(this.basket)
+    this.basket.voided = true;
     this.subTotal = 0;
     this.taxApplied = 0;
     this.total = 0;
+    this.virtualJournalService.onEvent({
+      basketVoided: true,
+      cashierName: this.basket.cashierName,
+      cashierId: this.basket.cashierId,
+      location: this.basket.location,
+      date: new Date(),
+      receiptNumber: this.basket.receiptNumber
+    });
     this.barcodeInput.nativeElement.focus();
   }
 
   public tender(payment: string) {
-    // based on payment type whether it's exact cash or credit
+    this.basketEnded();
+    if(payment === 'cash'){
+      alert('Exact cash paid. Basket ended.');
+    } else if(payment === 'credit') {
+      alert('Credit paid. Basket ended.');
+    };
+    this.virtualJournalService.onEvent({
+      orderTendered: true,
+      total: this.total,
+      cashierName: this.basket.cashierName,
+      cashierId: this.basket.cashierId,
+      location: this.basket.location,
+      date: new Date(),
+      receiptNumber: this.basket.receiptNumber
+    });
+    this.clearBasket();
   }
 
   public basketStarted(): boolean {
@@ -208,7 +300,7 @@ export class PosComponent implements OnInit {
 
   public prev() {
     if (this.startingItems === 0) {
-    this.barcodeInput.nativeElement.focus();
+      this.barcodeInput.nativeElement.focus();
       return;
     } else {
       this.pricebook = [];
@@ -223,6 +315,7 @@ export class PosComponent implements OnInit {
 
   public next() {
     if (this.displayedItems > this.fullPricebookArray.length) {
+      this.barcodeInput.nativeElement.focus();
       return;
     } else {
       this.pricebook = [];
