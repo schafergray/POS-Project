@@ -8,4 +8,7 @@ export interface Basket {
     location: string;
     voided: boolean;
     lineItems: LineItem[];
+    subTotal: number;
+    taxApplied: number;
+    total: number;
 }

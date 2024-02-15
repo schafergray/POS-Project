@@ -3,7 +3,7 @@
     width: 100%;
     height: 100%;
     grid-template-columns: 33.3% 66.6%;
-    background-image: linear-gradient(to right, black, darkBlue)
+    background-image: linear-gradient(to right, rgb(238,42,19), rgb(242,155,2), white)
 }
 
 .receipt {
@@ -14,7 +14,7 @@
     margin: 3% 10%;
     padding: 3% 0;
     border-radius: 12px;
-    box-shadow: 0 4px 8px 0 rgba(235,235,235,2);
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     background-color: white;
     max-height: 93vh;
@@ -22,11 +22,16 @@
 }
 
 .receipt:hover {
-    box-shadow: 0 12px 24px 0 rgba(235,235,235,5);
+    box-shadow: 0 12px 24px 0 rgba(0,0,0,0.6);
 }
 
 .header {
     grid-row: 1;
+}
+
+.receiptHeader {
+    margin: 1px;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .body {
@@ -34,7 +39,7 @@
     padding: 5px;
     grid-row: 2;
     border-radius: 12px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.6);
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     background-color: white;
     max-height: 60vh;
@@ -47,26 +52,25 @@
     margin-top: 1vh;
 }
 
+.receiptFooter {
+    margin: 1px;
+}
+
 .buttons {
     grid-column: 2;
     text-align: left;
     margin: 3% 10%;
     padding: 3% 0;
     border-radius: 12px;
-    box-shadow: 0 4px 8px 0 rgba(235,235,235,2);
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     background-color: white;
     max-height: 87vh;
 }
 
 .buttons:hover {
-    box-shadow: 0 12px 24px 0 rgba(235,235,235,6);
+    box-shadow: 0 12px 24px 0 rgba(0,0,0,0.6);
     transition: 0.3s;
-}
-
-.receiptHeader {
-    margin: 1px;
-    font-family: 'Courier New', Courier, monospace;
 }
 
 .receiptFooter {
