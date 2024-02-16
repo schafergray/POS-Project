@@ -15,7 +15,7 @@ import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.comp
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
-export class PosComponent implements OnInit {
+export class RegisterComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   handleBarcodeInput(event: KeyboardEvent) {
@@ -223,4 +223,4 @@ export class PosComponent implements OnInit {
   }
 }
 
-export default PosComponent;
+export default RegisterComponent;
