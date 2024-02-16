@@ -183,17 +183,6 @@ export class PosComponent implements OnInit {
     })
   }
 
-  public tender(payment: string) {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.basket = listener.tender(payment);
-      } else {
-        listener.tender(payment, this.basket);
-      }
-    })
-    this.clearBasket();
-  }
-
   public clearBasket() {
     this.listeners.forEach((listener: any) => {
       if( listener === this.basketComponent ) {
@@ -203,6 +192,17 @@ export class PosComponent implements OnInit {
       }
       
     })
+  }
+
+  public tender(payment: string) {
+    this.listeners.forEach((listener: any) => {
+      if( listener === this.basketComponent ) {
+        this.basket = listener.tender(payment);
+      } else {
+        listener.tender(payment, this.basket);
+      }
+    })
+    this.clearBasket();
   }
 
   public prev() {
