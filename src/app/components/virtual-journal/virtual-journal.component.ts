@@ -16,30 +16,30 @@ export class VirtualJournalComponent {
   };
 
   public addItem(basket: Basket) {
-    console.log('Item added to the basket.', basket);
+    console.log('Item added to the basket.', new Date(), basket);
   };
 
   public clearBasket(basket: Basket) {
-    console.log('Basket cleared.', basket);
+    console.log('Basket cleared.', new Date(), basket);
   };
 
   public voidLineItem(basket: Basket) {
-    console.log('Line Item voided.', basket);
+    console.log('Line Item voided.', new Date(), basket);
   };
 
   public voidBasket(basket: Basket) {
-    console.log('Basket voided.', basket);
+    console.log('Basket voided.', new Date(), basket);
   };
 
   public tender(payment: string, basket: Basket) {
-    console.log('Basket tendered.', basket)
+    console.log(`Basket tendered in ${payment}`, new Date(), basket)
   }
 
   public captureItemData(lineItem: LineItem) {
-    console.log('Line item selected.', lineItem)
+    console.log('Line item selected.', new Date(), lineItem)
   }
 
   public updateLocation(location: any) {
-    console.log(`Location updated to ${location.address.Address}, ${location.address.City}, ${location.address.RegionAbbr}`);
+    console.log(`Location updated to ${location.address.Address}, ${location.address.City}, ${location.address.RegionAbbr}`,  new Date(),);
   }
 }

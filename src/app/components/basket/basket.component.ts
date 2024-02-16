@@ -19,6 +19,8 @@ export class BasketComponent implements OnInit {
   shouldVoid: boolean = false;
   toBeVoided!: LineItem;
 
+  basketStarted!: boolean;
+
   basket: Basket = {
     receiptNumber: 0,
     cashierName: 'Ned Stark',
@@ -39,7 +41,7 @@ export class BasketComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  public getBasket() {
+  public getInitialBasketInfo() {
     return this.basket;
   }
 
@@ -49,7 +51,10 @@ export class BasketComponent implements OnInit {
   }
 
   public addItem(item: Item): Basket {
-    if(this.basket.lineItems.length === 0) {
+    if(!this.basketStarted) {
+      this.basketStarted = true;
+      this.basket = this.getInitialBasketInfo();
+      this.basket.date = new Date();
       this.basket.receiptNumber = this.basket.receiptNumber + 1;
     }
       this.basket.lineItems.push({
@@ -68,7 +73,7 @@ export class BasketComponent implements OnInit {
       receiptNumber: this.basket.receiptNumber,
       cashierName: 'Ned Stark',
       cashierId: 1234,
-      date: new Date(),
+      date: this.basket.date,
       location: this.basket.location,
       voided: false,
       lineItems: [],
@@ -76,6 +81,7 @@ export class BasketComponent implements OnInit {
       taxApplied: 0,
       total: 0,
     };
+    this.basketStarted = false;
     return this.basket;
   };
 
