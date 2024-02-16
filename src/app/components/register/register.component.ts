@@ -12,8 +12,8 @@ import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.comp
   selector: 'app-pos',
   standalone: true,
   imports: [CommonModule, BasketComponent],
-  templateUrl: './pos.component.html',
-  styleUrl: './pos.component.css'
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css'
 })
 export class PosComponent implements OnInit {
 

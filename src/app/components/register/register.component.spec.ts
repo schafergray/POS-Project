@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PosComponent } from './pos.component';
+import { PosComponent } from './register.component';
 
 describe('PosComponent', () => {
   let component: PosComponent;
