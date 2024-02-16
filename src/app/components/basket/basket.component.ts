@@ -39,6 +39,10 @@ export class BasketComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  public getBasket() {
+    return this.basket;
+  }
+
   public updateLocation (location: any) {
     this.basket.location = location.address.Address + ', ' + location.address.City + ', ' + location.address.RegionAbbr;
     return this.basket;

@@ -36,18 +36,7 @@ export class PosComponent implements OnInit {
   basketComponent = new BasketComponent(this.http);
   virtualJournalComponent = new VirtualJournalComponent();
 
-  basket: Basket = {
-    receiptNumber: 0,
-    cashierName: 'Ned Stark',
-    cashierId: 1234,
-    date: new Date(),
-    location: '',
-    voided: false,
-    lineItems: [],
-    subTotal: 0,
-    taxApplied: 0,
-    total: 0,
-  }
+  basket!: Basket;
 
   barcode: string = '';
   shouldVoid: boolean = false;
@@ -68,6 +57,8 @@ export class PosComponent implements OnInit {
 
   ngOnInit(): void {
     localStorage.clear();
+
+    this.basket = this.basketComponent.getBasket();
 
     this.getCurrentPosition().subscribe({
       next: (position) => {
