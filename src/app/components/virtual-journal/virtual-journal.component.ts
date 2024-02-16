@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Item } from '../../models/item';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
 
