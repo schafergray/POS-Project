@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Item } from '../../models/item';
 import { LineItem } from '../../models/line-item';
+import { Basket } from '../../models/basket';
 
 @Component({
   selector: 'app-virtual-journal',
@@ -12,30 +13,33 @@ import { LineItem } from '../../models/line-item';
 export class VirtualJournalComponent {
 
   constructor() {
-
   };
 
-  public addItem(item: Item) {
-    console.log(`${item.name} added to the basket`);
+  public addItem(basket: Basket) {
+    console.log('Item added to the basket.', basket);
   };
 
-  public clearBasket() {
-    console.log('Basket cleared.');
+  public clearBasket(basket: Basket) {
+    console.log('Basket cleared.', basket);
   };
 
-  public voidLineItem() {
-
+  public voidLineItem(basket: Basket) {
+    console.log('Line Item voided.', basket);
   };
 
-  public voidBasket() {
-
+  public voidBasket(basket: Basket) {
+    console.log('Basket voided.', basket);
   };
 
-  public tender(payment: string) {
-
+  public tender(payment: string, basket: Basket) {
+    console.log('Basket tendered.', basket)
   }
 
   public captureItemData(lineItem: LineItem) {
-    
+    console.log('Line item selected.', lineItem)
+  }
+
+  public updateLocation(location: any) {
+    console.log(`Location updated to ${location.address.Address}, ${location.address.City}, ${location.address.RegionAbbr}`);
   }
 }

@@ -51,7 +51,7 @@ export class PosComponent implements OnInit {
 
   barcode: string = '';
   shouldVoid: boolean = false;
-  toBeVoided: any;
+  toBeVoided!: LineItem;
 
   listeners: any = [this.basketComponent, this.virtualJournalComponent];
 
@@ -68,11 +68,19 @@ export class PosComponent implements OnInit {
 
   ngOnInit(): void {
     localStorage.clear();
+
     this.getCurrentPosition().subscribe({
       next: (position) => {
         this.getLocation(position.coords.latitude, position.coords.longitude).subscribe({
           next: (location: any) => {
-            this.basket.location = location.address.Address + ', ' + location.address.City + ', ' + location.address.RegionAbbr;
+            this.listeners.forEach((listener: any) => {
+              if(listener === this.basketComponent) {
+                this.basket = listener.updateLocation(location);
+              } else {
+                listener.updateLocation(location);
+              }
+              
+            })
           },
           error: (error: any) => {
             console.error('Something has gone wrong.', error)
@@ -100,7 +108,7 @@ export class PosComponent implements OnInit {
         }
       }
     })
-  }
+  };
 
   public getCurrentPosition(): Observable<any> {
     return new Observable((observer) => {
@@ -124,10 +132,6 @@ export class PosComponent implements OnInit {
     return this.http.get(`https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=${long},${lat}&f=json&token=AAPKd10bd6c383f04daabce9229c43e4cc577pQBOei4DowBmyCCfqfHXpUOu2meH0f63dVIRNMzG1ylva7sMxs8Tu7ZBlu1eT1U`, {responseType: 'json'});
   }
 
-  public handleChanges(event: any) {
-    console.log('POS', event)
-  }
-
   public parseCSV(): Observable<String> {
     return this.http.get('assets/pricebook.tsv', {responseType: 'text'})
   }
@@ -137,20 +141,9 @@ export class PosComponent implements OnInit {
       if( listener === this.basketComponent ) {
         this.basket = listener.addItem(item);
       } else {
-        listener.addItem(item);
+        listener.addItem(this.basket);
       }
     });
-  }
-
-  public clearBasket() {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.basket = listener.clearBasket();
-      } else {
-        listener.clearBasket();
-      }
-      
-    })
   }
 
   public captureItemData(lineItem: LineItem) {
@@ -169,12 +162,11 @@ export class PosComponent implements OnInit {
   public voidLineItem() {
     this.listeners.forEach((listener: any) => {
       if( listener === this.basketComponent ) {
-        this.returnObj = listener.voidLineItem();
+        this.returnObj = listener.voidLineItem(this.toBeVoided);
         this.basket = this.returnObj.basket;
-        this.toBeVoided = this.returnObj.toBeVoided;
         this.shouldVoid = this.returnObj.shouldVoid;
       } else {
-        listener.voidLineItem();
+        listener.voidLineItem(this.basket);
       }
     })
   }
@@ -182,9 +174,11 @@ export class PosComponent implements OnInit {
   public voidBasket() {
     this.listeners.forEach((listener: any) => {
       if( listener === this.basketComponent ) {
-        this.basket = listener.voidBasket();
+        this.returnObj = listener.voidBasket();
+        this.basket = this.returnObj.basket;
+        this.shouldVoid = this.returnObj.shouldVoid;
       } else {
-        listener.voidBasket();
+        listener.voidBasket(this.basket);
       }
     })
   }
@@ -194,8 +188,20 @@ export class PosComponent implements OnInit {
       if( listener === this.basketComponent ) {
         this.basket = listener.tender(payment);
       } else {
-        listener.tender(payment);
+        listener.tender(payment, this.basket);
       }
+    })
+    this.clearBasket();
+  }
+
+  public clearBasket() {
+    this.listeners.forEach((listener: any) => {
+      if( listener === this.basketComponent ) {
+        this.basket = listener.clearBasket();
+      } else {
+        listener.clearBasket(this.basket);
+      }
+      
     })
   }
 

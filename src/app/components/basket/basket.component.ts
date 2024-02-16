@@ -4,13 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
 import { Item } from '../../models/item';
-import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-basket',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './basket.component.html',
   styleUrl: './basket.component.css'
 })
@@ -18,7 +17,7 @@ export class BasketComponent implements OnInit {
 
   http: HttpClient;
   shouldVoid: boolean = false;
-  toBeVoided: any;
+  toBeVoided!: LineItem;
 
   basket: Basket = {
     receiptNumber: 0,
@@ -38,6 +37,11 @@ export class BasketComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  public updateLocation (location: any) {
+    this.basket.location = location.address.Address + ', ' + location.address.City + ', ' + location.address.RegionAbbr;
+    return this.basket;
   }
 
   public addItem(item: Item): Basket {
@@ -78,7 +82,7 @@ export class BasketComponent implements OnInit {
     this.basket.taxApplied = Number((this.basket.subTotal * 0.07).toFixed(2));
     this.basket.total = Number((this.basket.subTotal + this.basket.taxApplied).toFixed(2));
     this.shouldVoid = false;
-    return {basket: this.basket, toBeVoided: this.toBeVoided, shouldVoid: this.shouldVoid};
+    return {basket: this.basket, shouldVoid: this.shouldVoid};
   };
 
   public voidBasket() {
@@ -91,7 +95,7 @@ export class BasketComponent implements OnInit {
     this.basket.subTotal = 0;
     this.basket.taxApplied = 0;
     this.basket.total = 0;
-    return this.basket;
+    return {basket: this.basket, toBeVoided: this.toBeVoided, shouldVoid: this.shouldVoid};
   };
 
   public tender(payment: string) {
@@ -100,7 +104,6 @@ export class BasketComponent implements OnInit {
     } else if(payment === 'credit') {
       alert('Credit paid. Basket ended.');
     };
-    this.clearBasket();
     return this.basket;
   }
   
