@@ -20,7 +20,7 @@ export class RegisterComponent implements OnInit {
   basketComponent = new BasketComponent(this.http);
   virtualJournalComponent = new VirtualJournalComponent();
   listeners: any = [this.basketComponent, this.virtualJournalComponent];
-  
+
   basket!: Basket;
 
   @HostListener('window:keydown', ['$event'])
@@ -49,9 +49,7 @@ export class RegisterComponent implements OnInit {
   fullPricebookArray: Item[] = [];
   pricebook: Item[] = [];
 
-  constructor (
-    private http: HttpClient,
-    ) {
+  constructor (private http: HttpClient) {
   }
 
   ngOnInit(): void {
