@@ -53,6 +53,7 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    localStorage.clear();
     this.basket = this.basketComponent.getInitialBasketInfo();
 
     this.getCurrentPosition().subscribe({
