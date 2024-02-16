@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
 import { Item } from '../../models/item';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-basket',
