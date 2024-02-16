@@ -17,6 +17,12 @@ import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.comp
 })
 export class RegisterComponent implements OnInit {
 
+  basketComponent = new BasketComponent(this.http);
+  virtualJournalComponent = new VirtualJournalComponent();
+  listeners: any = [this.basketComponent, this.virtualJournalComponent];
+  
+  basket!: Basket;
+
   @HostListener('window:keydown', ['$event'])
   handleBarcodeInput(event: KeyboardEvent) {
     if(event.key !== "Enter") {
@@ -33,16 +39,9 @@ export class RegisterComponent implements OnInit {
 
   returnObj: any = {};
 
-  basketComponent = new BasketComponent(this.http);
-  virtualJournalComponent = new VirtualJournalComponent();
-
-  basket!: Basket;
-
   barcode: string = '';
   shouldVoid: boolean = false;
   toBeVoided!: LineItem;
-
-  listeners: any = [this.basketComponent, this.virtualJournalComponent];
 
   displayedItems: number = 20;
   startingItems: number = 0;
@@ -99,6 +98,7 @@ export class RegisterComponent implements OnInit {
     })
   };
 
+// ============= These methods are called in ngOnInit() to get location and parse CSV pricebook file
   public getCurrentPosition(): Observable<any> {
     return new Observable((observer) => {
       if ('geolocation' in navigator) {
@@ -124,7 +124,9 @@ export class RegisterComponent implements OnInit {
   public parseCSV(): Observable<String> {
     return this.http.get('assets/pricebook.tsv', {responseType: 'text'})
   }
+// =============
 
+// ============= These are the methods that manipulate the basket
   public addItem(item: Item) {
     this.listeners.forEach((listener: any) => {
       if( listener === this.basketComponent ) {
@@ -193,6 +195,7 @@ export class RegisterComponent implements OnInit {
     })
     this.clearBasket();
   }
+// =============
 
   public prev() {
     if (this.startingItems === 0) {

@@ -40,6 +40,6 @@ export class VirtualJournalComponent {
   }
 
   public updateLocation(location: any) {
-    console.log(`Location updated to ${location.address.Address}, ${location.address.City}, ${location.address.RegionAbbr}`,  new Date(),);
+    console.log(`Location updated to ${location.address.Address}, ${location.address.City}, ${location.address.RegionAbbr}`,  new Date());
   }
 }
