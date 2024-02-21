@@ -127,6 +127,7 @@ export class RegisterComponent implements OnInit {
   }
 // =============
 
+// ============= This is the event handler method
 public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
   this.self[`${eventAction}`](data);
   this.eventsService.handleEvent.emit({
@@ -135,6 +136,7 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
     data: data
   });
 }
+// =============
 
 // ============= These are the methods that manipulate the basket
   public addItem(item: Item) {
