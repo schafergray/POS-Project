@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { BasketComponent } from '../basket/basket.component';
 import { Basket } from '../../models/basket';
 import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
+import { EventsService } from '../../services/events.service';
 
 @Component({
   selector: 'app-pos',
@@ -16,9 +17,10 @@ import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.comp
   styleUrl: './register.component.css'
 })
 export class RegisterComponent implements OnInit {
+  self: any;
 
-  basketComponent = new BasketComponent(this.http);
-  virtualJournalComponent = new VirtualJournalComponent();
+  basketComponent = new BasketComponent(this.eventsService);
+  virtualJournalComponent = new VirtualJournalComponent(this.eventsService);
   listeners: any = [this.basketComponent, this.virtualJournalComponent];
 
   basket!: Basket;
@@ -49,7 +51,10 @@ export class RegisterComponent implements OnInit {
   fullPricebookArray: Item[] = [];
   pricebook: Item[] = [];
 
-  constructor (private http: HttpClient) {
+  constructor (
+    private http: HttpClient,
+    private eventsService: EventsService) {
+      this.self = this;
   }
 
   ngOnInit(): void {
@@ -60,14 +65,7 @@ export class RegisterComponent implements OnInit {
       next: (position) => {
         this.getLocation(position.coords.latitude, position.coords.longitude).subscribe({
           next: (location: any) => {
-            this.listeners.forEach((listener: any) => {
-              if(listener === this.basketComponent) {
-                this.basket = listener.updateLocation(location);
-              } else {
-                listener.updateLocation(location);
-              }
-              
-            })
+            this.handleEvent('updateLocation', 'Location updated', location)
           },
           error: (error: any) => {
             console.error('Something has gone wrong.', error)
@@ -123,75 +121,101 @@ export class RegisterComponent implements OnInit {
   public parseCSV(): Observable<String> {
     return this.http.get('assets/pricebook.tsv', {responseType: 'text'})
   }
+
+  public updateLocation (location: any) {
+    this.basket.location = location.address.Address + ', ' + location.address.City + ', ' + location.address.RegionAbbr;
+  }
 // =============
+
+public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
+  this.self[`${eventAction}`](data);
+  this.eventsService.handleEvent.emit({
+    basket: this.basket,
+    message: listenerMessage,
+    data: data
+  });
+}
 
 // ============= These are the methods that manipulate the basket
   public addItem(item: Item) {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.basket = listener.addItem(item);
-      } else {
-        listener.addItem(this.basket);
-      }
-    });
+    if(!this.basket.basketStarted) {
+      this.basket = {
+        basketStarted: true,
+        receiptNumber: this.basket.receiptNumber + 1,
+        cashierName: 'Ned Stark',
+        cashierId: 1234,
+        date: new Date(),
+        location: this.basket.location,
+        voided: false,
+        lineItems: [],
+        subTotal: 0,
+        taxApplied: 0,
+        total: 0,
+      };
+    }
+      this.basket.lineItems.push({
+        item: item,
+        quantity: 1,
+        voided: false
+      });
+      this.basket.subTotal = Number((this.basket.subTotal + item.price).toFixed(2));
+      this.basket.taxApplied = Number((this.basket.subTotal * 0.07).toFixed(2));
+      this.basket.total = Number((this.basket.subTotal + this.basket.taxApplied).toFixed(2));
   }
 
   public captureItemData(lineItem: LineItem) {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.returnObj = listener.captureItemData(lineItem);
-        this.toBeVoided = this.returnObj.toBeVoided;
-        this.shouldVoid = this.returnObj.shouldVoid;
-      } else {
-        listener.captureItemData(lineItem);
-      }
-      
-    })
+    if(lineItem.voided ) {
+      return false;
+    } else {
+      this.toBeVoided = lineItem;
+      this.shouldVoid = true;
+      return {toBeVoided: this.toBeVoided, shouldVoid: this.shouldVoid}
+    }
   }
 
   public voidLineItem() {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.returnObj = listener.voidLineItem(this.toBeVoided);
-        this.basket = this.returnObj.basket;
-        this.shouldVoid = this.returnObj.shouldVoid;
-      } else {
-        listener.voidLineItem(this.basket);
-      }
-    })
+    this.toBeVoided.quantity = 0;
+    this.toBeVoided.voided = true;
+    this.basket.subTotal = Number((this.basket.subTotal - this.toBeVoided.item.price).toFixed(2));
+    this.basket.taxApplied = Number((this.basket.subTotal * 0.07).toFixed(2));
+    this.basket.total = Number((this.basket.subTotal + this.basket.taxApplied).toFixed(2));
+    this.shouldVoid = false;
   }
 
   public voidBasket() {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.returnObj = listener.voidBasket();
-        this.basket = this.returnObj.basket;
-        this.shouldVoid = this.returnObj.shouldVoid;
-      } else {
-        listener.voidBasket(this.basket);
-      }
+    this.shouldVoid = false;
+    this.basket.lineItems.forEach( (lineItem: LineItem) => {
+      lineItem.quantity = 0;
+      lineItem.voided = true;
     })
+    this.basket.voided = true;
+    this.basket.subTotal = 0;
+    this.basket.taxApplied = 0;
+    this.basket.total = 0;
   }
 
   public clearBasket() {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.basket = listener.clearBasket();
-      } else {
-        listener.clearBasket(this.basket);
-      }
-      
-    })
+    this.basket = {
+      basketStarted: false,
+      receiptNumber: this.basket.receiptNumber,
+      cashierName: 'Ned Stark',
+      cashierId: 1234,
+      date: this.basket.date,
+      location: this.basket.location,
+      voided: false,
+      lineItems: [],
+      subTotal: 0,
+      taxApplied: 0,
+      total: 0,
+    };
   }
 
   public tender(payment: string) {
-    this.listeners.forEach((listener: any) => {
-      if( listener === this.basketComponent ) {
-        this.basket = listener.tender(payment);
-      } else {
-        listener.tender(payment, this.basket);
-      }
-    })
+    if(payment === 'cash'){
+      alert('Exact cash paid. Basket ended.');
+    } else if(payment === 'credit') {
+      alert('Credit paid. Basket ended.');
+    };
     this.clearBasket();
   }
 // =============

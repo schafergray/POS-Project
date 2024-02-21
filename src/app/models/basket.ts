@@ -1,6 +1,7 @@
 import { LineItem } from "./line-item";
 
 export interface Basket {
+    basketStarted: boolean;
     receiptNumber: number;
     cashierName: string;
     cashierId: number;
