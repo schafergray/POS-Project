@@ -139,21 +139,29 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
 // =============
 
 // ============= These are the methods that manipulate the basket
+  public basketStarted() {
+    this.basket = {
+      basketStarted: true,
+      receiptNumber: this.basket.receiptNumber + 1,
+      cashierName: 'Ned Stark',
+      cashierId: 1234,
+      date: new Date(),
+      location: this.basket.location,
+      voided: false,
+      lineItems: [],
+      subTotal: 0,
+      taxApplied: 0,
+      total: 0,
+    };
+  }
+
+  public basketEnded() {
+    this.basket.basketStarted = false;
+  }
+
   public addItem(item: Item) {
     if(!this.basket.basketStarted) {
-      this.basket = {
-        basketStarted: true,
-        receiptNumber: this.basket.receiptNumber + 1,
-        cashierName: 'Ned Stark',
-        cashierId: 1234,
-        date: new Date(),
-        location: this.basket.location,
-        voided: false,
-        lineItems: [],
-        subTotal: 0,
-        taxApplied: 0,
-        total: 0,
-      };
+      this.handleEvent('basketStarted', 'New basket started');
     }
       this.basket.lineItems.push({
         item: item,
@@ -191,14 +199,15 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
       lineItem.voided = true;
     })
     this.basket.voided = true;
-    this.basket.subTotal = 0;
-    this.basket.taxApplied = 0;
-    this.basket.total = 0;
+    setTimeout(() => {
+      this.handleEvent('clearBasket', 'Basket cleared');
+      this.handleEvent('basketEnded', 'Basket ended')
+    }, 5000)
   }
 
   public clearBasket() {
     this.basket = {
-      basketStarted: false,
+      basketStarted: true,
       receiptNumber: this.basket.receiptNumber,
       cashierName: 'Ned Stark',
       cashierId: 1234,
@@ -219,6 +228,7 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
       alert('Credit paid. Basket ended.');
     };
     this.clearBasket();
+    this.basket.basketStarted = false;
   }
 // =============
 
