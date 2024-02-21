@@ -199,6 +199,9 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
       lineItem.voided = true;
     })
     this.basket.voided = true;
+    this.basket.subTotal = 0;
+    this.basket.taxApplied = 0;
+    this.basket.total = 0;
     setTimeout(() => {
       this.handleEvent('clearBasket', 'Basket cleared');
       this.handleEvent('basketEnded', 'Basket ended')
