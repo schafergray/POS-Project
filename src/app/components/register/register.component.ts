@@ -32,7 +32,7 @@ export class RegisterComponent implements OnInit {
     } else if (event.key === "Enter") {
       this.fullPricebookArray.forEach((item: Item) => {
         if (item.code === Number(this.barcode)) {
-          this.addItem(item);
+          this.handleEvent('addItem', 'Item added', item);
         }
       })
       this.barcode = '';
@@ -225,6 +225,7 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
   }
 
   public tender(payment: string) {
+    this.shouldVoid = false;
     if(payment === 'cash'){
       alert('Exact cash paid. Basket ended.');
     } else if(payment === 'credit') {

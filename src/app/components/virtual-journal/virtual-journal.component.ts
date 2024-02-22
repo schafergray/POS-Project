@@ -28,10 +28,4 @@ export class VirtualJournalComponent implements OnDestroy {
   ngOnDestroy(): void {
     this._serviceSubscription.unsubscribe();
   }
-
-  public captureItemData(lineItem: LineItem) {
-    this.localStorageKey = this.localStorageKey + 1;
-    localStorage.setItem(`Line item selected ${this.localStorageKey}`, JSON.stringify(lineItem))
-    console.log('Line item selected.', new Date(), lineItem)
-  }
 }
