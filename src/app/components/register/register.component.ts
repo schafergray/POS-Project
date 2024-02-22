@@ -140,20 +140,11 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
 
 // ============= These are the methods that manipulate the basket
   public basketStarted() {
-    this.basket = {
-      basketStarted: true,
-      receiptNumber: this.basket.receiptNumber + 1,
-      cashierName: 'Ned Stark',
-      cashierId: 1234,
-      date: new Date(),
-      location: this.basket.location,
-      voided: false,
-      lineItems: [],
-      subTotal: 0,
-      taxApplied: 0,
-      total: 0,
+    this.basket.basketStarted = true;
+    this.basket.receiptNumber = this.basket.receiptNumber + 1;
+    this.basket.date = new Date();
+    this.basket.location = this.basket.location;
     };
-  }
 
   public basketEnded() {
     this.basket.basketStarted = false;
@@ -209,20 +200,12 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
   }
 
   public clearBasket() {
-    this.basket = {
-      basketStarted: true,
-      receiptNumber: this.basket.receiptNumber,
-      cashierName: 'Ned Stark',
-      cashierId: 1234,
-      date: this.basket.date,
-      location: this.basket.location,
-      voided: false,
-      lineItems: [],
-      subTotal: 0,
-      taxApplied: 0,
-      total: 0,
+    this.basket.voided = false;
+    this.basket.lineItems = [];
+    this.basket.subTotal = 0;
+    this.basket.taxApplied = 0;
+    this.basket.total = 0;
     };
-  }
 
   public tender(payment: string) {
     /** Check for discounts 
