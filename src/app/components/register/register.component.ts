@@ -225,6 +225,14 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
   }
 
   public tender(payment: string) {
+    /** Check for discounts 
+     * from the AWS EC2 service here
+     * before executing the rest of
+     * the tender() method. If no discounts
+     * then behavior should continue. If discounts
+     * then subtotal, tax, and total should be
+     * updated accordingly.
+     */
     this.shouldVoid = false;
     if(payment === 'cash'){
       alert('Exact cash paid. Basket ended.');
