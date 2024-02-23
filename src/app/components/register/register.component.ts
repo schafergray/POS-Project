@@ -206,7 +206,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     setTimeout(() => {
       this.handleEvent('clearBasket', 'Basket cleared');
       this.handleEvent('basketEnded', 'Basket ended');
-    }, 5000)
+    }, 1500)
   }
 
   public clearBasket() {
@@ -242,7 +242,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     };
     setTimeout(() => {
       this.handleEvent('basketEnded', 'Basket ended');
-    }, 2000);
+    }, 1500);
   };
 // =============
 
