@@ -28,6 +28,7 @@ export class RegisterComponent implements OnInit {
   basket!: Basket;
   totalAmount: boolean = false;
   readyForTender: boolean = false;
+  disableButtons: boolean = false;
 
   @HostListener('window:keydown', ['$event'])
   handleBarcodeInput(event: KeyboardEvent) {
@@ -190,6 +191,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
   }
 
   public voidBasket() {
+    this.disableButtons = true;
     this.readyForTender = false;
     this.totalAmount = true;
     this.shouldVoid = false;
@@ -214,6 +216,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     this.basket.taxApplied = 0;
     this.basket.total = 0;
     this.totalAmount = false;
+    this.disableButtons = false;
     };
 
   public async total() {
@@ -226,9 +229,10 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
         alert('Discounts applied!');
       };
     });
-  }
+  };
 
   public tender(payment: string) {
+    this.disableButtons = true;
     this.readyForTender = false;
     this.shouldVoid = false;
     if(payment === 'cash'){
@@ -239,7 +243,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     setTimeout(() => {
       this.handleEvent('basketEnded', 'Basket ended');
     }, 2000);
-  }
+  };
 // =============
 
   public prev() {

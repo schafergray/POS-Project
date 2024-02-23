@@ -22,17 +22,17 @@
             <p class="receiptFooter">Tax:-----------------${{basket.taxApplied}}</p>
             <br />
             <p class="receiptFooter">Total:---------------${{basket.total}}</p>
-            <button *ngIf="(this.basket.lineItems.length > 0) && ((readyForTender === true) || (totalAmount === false))" (click)="handleEvent('clearBasket', 'Basket cleared')" class="receiptFooter">Clear All</button>
-            <button *ngIf="shouldVoid" (click)="handleEvent('voidLineItem', 'Line item voided')" class="receiptFooter">Void Item</button>
-            <button *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided === false) && ((readyForTender === true) || (totalAmount === false))" (click)="handleEvent('voidBasket', 'Basket voided')" class="receiptFooter">Void Basket</button>
+            <button *ngIf="(this.basket.lineItems.length > 0) && ((readyForTender === true) || (totalAmount === false))" (click)="handleEvent('clearBasket', 'Basket cleared')" class="receiptFooter" [disabled]="disableButtons">Clear All</button>
+            <button *ngIf="shouldVoid" (click)="handleEvent('voidLineItem', 'Line item voided')" class="receiptFooter" [disabled]="disableButtons">Void Item</button>
+            <button *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided === false) && ((readyForTender === true) || (totalAmount === false))" (click)="handleEvent('voidBasket', 'Basket voided')" class="receiptFooter" [disabled]="disableButtons">Void Basket</button>
             <button (click)="handleEvent('total', 'Basket totaled')" *ngIf="(this.basket.lineItems.length > 0) && (totalAmount === false)">Total</button>
-            <button (click)="handleEvent('tender', 'Basket tenderd', 'cash')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (readyForTender === true)">Cash</button>
-            <button (click)="handleEvent('tender', 'Basket tenderd', 'credit')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (readyForTender === true)">Credit</button>
+            <button (click)="handleEvent('tender', 'Basket tenderd', 'cash')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (readyForTender === true)" [disabled]="disableButtons">Cash</button>
+            <button (click)="handleEvent('tender', 'Basket tenderd', 'credit')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (readyForTender === true)" [disabled]="disableButtons">Credit</button>
         </div>
     </div>
     <div class="buttons">
         <div class="itemButtons">
-            <button *ngFor="let item of pricebook" class="itemButton" (click)="handleEvent('addItem', 'Item added', item)">{{item.name}}</button>
+            <button *ngFor="let item of pricebook" class="itemButton" (click)="handleEvent('addItem', 'Item added', item)" [disabled]="disableButtons">{{item.name}}</button>
         </div>
         <div class="navButtons">
             <button class="navButton" (click)="prev()">Prev</button>
