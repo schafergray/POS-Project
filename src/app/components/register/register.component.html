@@ -22,11 +22,12 @@
             <p class="receiptFooter">Tax:-----------------${{basket.taxApplied}}</p>
             <br />
             <p class="receiptFooter">Total:---------------${{basket.total}}</p>
-            <button (click)="handleEvent('clearBasket', 'Basket cleared')" class="receiptFooter">Clear All</button>
+            <button *ngIf="this.basket.lineItems.length > 0" (click)="handleEvent('clearBasket', 'Basket cleared')" class="receiptFooter">Clear All</button>
             <button *ngIf="shouldVoid" (click)="handleEvent('voidLineItem', 'Line item voided')" class="receiptFooter">Void Item</button>
             <button *ngIf="this.basket.lineItems.length > 0 && this.basket.voided === false" (click)="handleEvent('voidBasket', 'Basket voided')" class="receiptFooter">Void Basket</button>
-            <button (click)="handleEvent('tender', 'Basket tenderd', 'cash')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true)">Cash</button>
-            <button (click)="handleEvent('tender', 'Basket tenderd', 'credit')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true)">Credit</button>
+            <button (click)="handleEvent('total', 'Basket totaled')" *ngIf="(this.basket.lineItems.length > 0) && (totalAmount === false)">Total</button>
+            <button (click)="handleEvent('tender', 'Basket tenderd', 'cash')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (totalAmount === true)">Cash</button>
+            <button (click)="handleEvent('tender', 'Basket tenderd', 'credit')" *ngIf="(this.basket.lineItems.length > 0) && (this.basket.voided !== true) && (totalAmount === true)">Credit</button>
         </div>
     </div>
     <div class="buttons">

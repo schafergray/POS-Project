@@ -8,13 +8,15 @@ import { BasketComponent } from '../basket/basket.component';
 import { Basket } from '../../models/basket';
 import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
 import { EventsService } from '../../services/events.service';
+import { DiscountsService } from '../../services/discounts.service';
 
 @Component({
   selector: 'app-pos',
   standalone: true,
   imports: [CommonModule, BasketComponent],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.css',
+  providers: [EventsService, DiscountsService]
 })
 export class RegisterComponent implements OnInit {
   self: any;
@@ -24,6 +26,7 @@ export class RegisterComponent implements OnInit {
   listeners: any = [this.basketComponent, this.virtualJournalComponent];
 
   basket!: Basket;
+  totalAmount: boolean = false;
 
   @HostListener('window:keydown', ['$event'])
   handleBarcodeInput(event: KeyboardEvent) {
@@ -53,7 +56,8 @@ export class RegisterComponent implements OnInit {
 
   constructor (
     private http: HttpClient,
-    private eventsService: EventsService) {
+    private eventsService: EventsService,
+    private discountsService: DiscountsService) {
       this.self = this;
   }
 
@@ -128,8 +132,8 @@ export class RegisterComponent implements OnInit {
 // =============
 
 // ============= This is the event handler method
-public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
-  this.self[`${eventAction}`](data);
+public async handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
+  await this.self[`${eventAction}`](data);
   this.eventsService.handleEvent.emit({
     basket: this.basket,
     message: listenerMessage,
@@ -148,6 +152,7 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
 
   public basketEnded() {
     this.basket.basketStarted = false;
+    this.handleEvent('clearBasket', 'Basket cleared')
   }
 
   public addItem(item: Item) {
@@ -195,7 +200,7 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
     this.basket.total = 0;
     setTimeout(() => {
       this.handleEvent('clearBasket', 'Basket cleared');
-      this.handleEvent('basketEnded', 'Basket ended')
+      this.handleEvent('basketEnded', 'Basket ended');
     }, 5000)
   }
 
@@ -207,23 +212,28 @@ public handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
     this.basket.total = 0;
     };
 
-  public tender(payment: string) {
-    /** Check for discounts 
-     * from the AWS EC2 service here
-     * before executing the rest of
-     * the tender() method. If no discounts
-     * then behavior should continue. If discounts
-     * then subtotal, tax, and total should be
-     * updated accordingly.
-     */
+  public async total() {
+    await this.discountsService.checkForDiscounts(this.basket).subscribe((res: any) => {
+      let response = JSON.parse(res);
+      this.basket.total = Number((this.basket.total - response.discount).toFixed(2));
+      this.totalAmount = true;
+      if (response.discount > 0) {
+        alert('Discounts applied!');
+      };
+    });
+  }
+
+  public async tender(payment: string) {
+    this.totalAmount = false;
     this.shouldVoid = false;
     if(payment === 'cash'){
       alert('Exact cash paid. Basket ended.');
     } else if(payment === 'credit') {
       alert('Credit paid. Basket ended.');
     };
-    this.clearBasket();
-    this.basket.basketStarted = false;
+    setTimeout(() => {
+      this.handleEvent('basketEnded', 'Basket ended');
+    }, 5000);
   }
 // =============
 
