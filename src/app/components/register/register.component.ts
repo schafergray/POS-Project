@@ -27,6 +27,7 @@ export class RegisterComponent implements OnInit {
 
   basket!: Basket;
   totalAmount: boolean = false;
+  readyForTender: boolean = false;
 
   @HostListener('window:keydown', ['$event'])
   handleBarcodeInput(event: KeyboardEvent) {
@@ -189,6 +190,8 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
   }
 
   public voidBasket() {
+    this.readyForTender = false;
+    this.totalAmount = true;
     this.shouldVoid = false;
     this.basket.lineItems.forEach( (lineItem: LineItem) => {
       lineItem.quantity = 0;
@@ -210,6 +213,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     this.basket.subTotal = 0;
     this.basket.taxApplied = 0;
     this.basket.total = 0;
+    this.totalAmount = false;
     };
 
   public async total() {
@@ -217,14 +221,15 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
       let response = JSON.parse(res);
       this.basket.total = Number((this.basket.total - response.discount).toFixed(2));
       this.totalAmount = true;
+      this.readyForTender = true;
       if (response.discount > 0) {
         alert('Discounts applied!');
       };
     });
   }
 
-  public async tender(payment: string) {
-    this.totalAmount = false;
+  public tender(payment: string) {
+    this.readyForTender = false;
     this.shouldVoid = false;
     if(payment === 'cash'){
       alert('Exact cash paid. Basket ended.');
@@ -233,7 +238,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     };
     setTimeout(() => {
       this.handleEvent('basketEnded', 'Basket ended');
-    }, 5000);
+    }, 2000);
   }
 // =============
 
