@@ -149,6 +149,7 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     this.basket.basketStarted = true;
     this.basket.receiptNumber = this.basket.receiptNumber + 1;
     this.basket.date = new Date();
+    this.basket.lineItems = [];
     this.basket.location = this.basket.location;
     };
 
