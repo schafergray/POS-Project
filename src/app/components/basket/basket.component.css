@@ -1,0 +1,29 @@
+.header {
+    grid-row: 1;
+}
+
+.receiptHeader {
+    margin: 1px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.body {
+    margin: 5px;
+    padding: 5px;
+    grid-row: 2;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    background-color: white;
+    max-height: 60vh;
+    min-height: 60vh;
+    overflow-y: scroll;
+}
+
+.receiptFooter {
+    margin: 1px;
+}
+
+ul {
+    list-style-type: none;
+}

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Item } from '../../models/item';
 import { LineItem } from '../../models/line-item';
 import { CommonModule } from '@angular/common';
@@ -18,8 +18,9 @@ import { DiscountsService } from '../../services/discounts.service';
   styleUrl: './register.component.css',
   providers: [EventsService, DiscountsService]
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   self: any;
+  private _serviceSubscription: any;
 
   basketComponent = new BasketComponent(this.eventsService);
   virtualJournalComponent = new VirtualJournalComponent(this.eventsService);
@@ -60,6 +61,11 @@ export class RegisterComponent implements OnInit {
     private http: HttpClient,
     private eventsService: EventsService,
     private discountsService: DiscountsService) {
+      this._serviceSubscription = this.eventsService.captureLineItem.subscribe({
+        next: (event: any) => {
+          this.handleEvent(event.action, event.message, event.data);
+        }
+      });
       this.self = this;
   }
 
@@ -99,6 +105,10 @@ export class RegisterComponent implements OnInit {
         }
       }
     })
+  };
+
+  ngOnDestroy(): void {
+    this._serviceSubscription.unsubscribe();
   };
 
 // ============= These methods are called in ngOnInit() to get location and parse CSV pricebook file

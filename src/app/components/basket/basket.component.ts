@@ -39,14 +39,23 @@ export class BasketComponent implements OnInit, OnDestroy {
         next: (event: any) => {
           this.basket = event.basket;
         }
-      })
+      });
   }
 
   ngOnInit(): void {
+    this.basket = this.initialBasket;
   }
 
   ngOnDestroy(): void {
     this._serviceSubscription.unsubscribe();
+  };
+
+  public async handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
+    this.eventsService.captureLineItem.emit({
+      action: eventAction,
+      message: listenerMessage,
+      data: data
+    });
   }
 
   public getInitialBasketInfo() {

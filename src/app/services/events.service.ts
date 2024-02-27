@@ -6,6 +6,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 export class EventsService {
 
   handleEvent = new EventEmitter<any>();
+  captureLineItem = new EventEmitter<any>();
 
   constructor() { }
 }
