@@ -214,7 +214,6 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
     this.basket.taxApplied = 0;
     this.basket.total = 0;
     setTimeout(() => {
-      this.handleEvent('clearBasket', 'Basket cleared');
       this.handleEvent('basketEnded', 'Basket ended');
     }, 1500)
   }
