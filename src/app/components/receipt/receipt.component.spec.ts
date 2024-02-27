@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BasketComponent } from './basket.component';
+import { BasketComponent } from './receipt.component';
 
 describe('BasketComponent', () => {
   let component: BasketComponent;

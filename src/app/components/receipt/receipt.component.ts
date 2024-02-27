@@ -8,8 +8,8 @@ import { EventsService } from '../../services/events.service';
   selector: 'app-basket',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './basket.component.html',
-  styleUrl: './basket.component.css'
+  templateUrl: './receipt.component.html',
+  styleUrl: './receipt.component.css'
 })
 export class BasketComponent implements OnInit, OnDestroy {
   private _serviceSubscription: any;

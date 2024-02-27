@@ -4,7 +4,7 @@ import { LineItem } from '../../models/line-item';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BasketComponent } from '../basket/basket.component';
+import { BasketComponent } from '../receipt/receipt.component';
 import { Basket } from '../../models/basket';
 import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
 import { EventsService } from '../../services/events.service';
