@@ -4,6 +4,7 @@ import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
 import { RegisterService } from '../../services/register.service';
 import RegisterComponent from '../register/register.component';
+import { ReceiptService } from '../../services/receipt.service';
 
 @Component({
   selector: 'app-receipt',
@@ -12,37 +13,33 @@ import RegisterComponent from '../register/register.component';
   templateUrl: './receipt.component.html',
   styleUrl: './receipt.component.css'
 })
-export class ReceiptComponent implements OnInit, OnDestroy {
-  private _serviceSubscription: any;
+export class ReceiptComponent implements OnInit {
 
   shouldVoid: boolean = false;
   toBeVoided!: LineItem;
 
-  basket!: Basket;
+  registerBasket!: Basket;
 
   constructor(
     private registerService: RegisterService,
+    private receiptService: ReceiptService,
     private register: RegisterComponent
     ) {
-      this._serviceSubscription = this.registerService.handleEvent.subscribe({
+      this.registerService.handleEvent.subscribe({
         next: (event: any) => {
-          this.basket = event.basket;
+          this.registerBasket = event.basket;
         }
       });
   }
 
   ngOnInit(): void {
-    this.basket = this.register.getInitialBasket();
+    this.registerBasket = this.register.getInitialBasket();
   }
-
-  ngOnDestroy(): void {
-    this._serviceSubscription.unsubscribe();
-  };
 
   public captureLineItem = new EventEmitter<any>();
 
   public async handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
-    this.registerService.captureLineItem.emit({
+    this.receiptService.captureLineItem.emit({
       action: eventAction,
       message: listenerMessage,
       data: data

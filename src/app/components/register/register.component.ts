@@ -6,8 +6,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ReceiptComponent } from '../receipt/receipt.component';
 import { Basket } from '../../models/basket';
+import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
 import { RegisterService } from '../../services/register.service';
 import { DiscountsService } from '../../services/discounts.service';
+import { ReceiptService } from '../../services/receipt.service';
 
 @Component({
   selector: 'app-pos',
@@ -19,6 +21,9 @@ import { DiscountsService } from '../../services/discounts.service';
 })
 export class RegisterComponent implements OnInit {
   self: any;
+
+  receiptComponent = new ReceiptComponent(this.registerService, this.receiptService, this);
+  virtualJournalComponent = new VirtualJournalComponent(this.registerService);
 
   initialBasket: Basket = {
     basketStarted: false,
@@ -67,9 +72,10 @@ export class RegisterComponent implements OnInit {
   constructor (
     private http: HttpClient,
     private registerService: RegisterService,
+    private receiptService: ReceiptService,
     private discountsService: DiscountsService
   ) {
-      this.registerService.captureLineItem.subscribe({
+      this.receiptService.captureLineItem.subscribe({
         next: (event: any) => {
           this.handleEvent(event.action, event.message, event.data);
         }
