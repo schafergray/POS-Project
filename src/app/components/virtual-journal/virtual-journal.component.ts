@@ -1,7 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { LineItem } from '../../models/line-item';
-import { Basket } from '../../models/basket';
-import { EventsService } from '../../services/events.service';
+import { RegisterService } from '../../services/register.service';
 
 @Component({
   selector: 'app-virtual-journal',
@@ -15,8 +13,8 @@ export class VirtualJournalComponent implements OnDestroy {
   localStorageKey: number = 0
 
   constructor(
-    private eventsService: EventsService) {
-      this._serviceSubscription = this.eventsService.handleEvent.subscribe({
+    private registerService: RegisterService) {
+      this._serviceSubscription = this.registerService.handleEvent.subscribe({
         next: (event: any) => {
           this.localStorageKey = this.localStorageKey + 1;
           localStorage.setItem(`${event.message} ${this.localStorageKey}`, JSON.stringify(event.basket));

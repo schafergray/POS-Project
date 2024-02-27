@@ -1,40 +1,30 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
-import { EventsService } from '../../services/events.service';
+import { RegisterService } from '../../services/register.service';
+import RegisterComponent from '../register/register.component';
 
 @Component({
-  selector: 'app-basket',
+  selector: 'app-receipt',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './receipt.component.html',
   styleUrl: './receipt.component.css'
 })
-export class BasketComponent implements OnInit, OnDestroy {
+export class ReceiptComponent implements OnInit, OnDestroy {
   private _serviceSubscription: any;
 
   shouldVoid: boolean = false;
   toBeVoided!: LineItem;
 
-  initialBasket: Basket = {
-    basketStarted: false,
-    receiptNumber: 0,
-    cashierName: 'Ned Stark',
-    cashierId: 1234,
-    date: new Date(),
-    location: '',
-    voided: false,
-    lineItems: [],
-    subTotal: 0,
-    taxApplied: 0,
-    total: 0,
-  }
-
   basket!: Basket;
 
-  constructor( private eventsService: EventsService ) {
-      this._serviceSubscription = this.eventsService.handleEvent.subscribe({
+  constructor(
+    private registerService: RegisterService,
+    private register: RegisterComponent
+    ) {
+      this._serviceSubscription = this.registerService.handleEvent.subscribe({
         next: (event: any) => {
           this.basket = event.basket;
         }
@@ -42,23 +32,21 @@ export class BasketComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.basket = this.initialBasket;
+    this.basket = this.register.getInitialBasket();
   }
 
   ngOnDestroy(): void {
     this._serviceSubscription.unsubscribe();
   };
 
+  public captureLineItem = new EventEmitter<any>();
+
   public async handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
-    this.eventsService.captureLineItem.emit({
+    this.registerService.captureLineItem.emit({
       action: eventAction,
       message: listenerMessage,
       data: data
     });
-  }
-
-  public getInitialBasketInfo() {
-    return this.initialBasket;
   }
 
 }

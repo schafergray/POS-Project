@@ -1,32 +1,41 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Item } from '../../models/item';
 import { LineItem } from '../../models/line-item';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BasketComponent } from '../receipt/receipt.component';
+import { ReceiptComponent } from '../receipt/receipt.component';
 import { Basket } from '../../models/basket';
-import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
-import { EventsService } from '../../services/events.service';
+import { RegisterService } from '../../services/register.service';
 import { DiscountsService } from '../../services/discounts.service';
 
 @Component({
   selector: 'app-pos',
   standalone: true,
-  imports: [CommonModule, BasketComponent],
+  imports: [CommonModule, ReceiptComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
-  providers: [EventsService, DiscountsService]
+  providers: [RegisterService, DiscountsService]
 })
-export class RegisterComponent implements OnInit, OnDestroy {
+export class RegisterComponent implements OnInit {
   self: any;
-  private _serviceSubscription: any;
 
-  basketComponent = new BasketComponent(this.eventsService);
-  virtualJournalComponent = new VirtualJournalComponent(this.eventsService);
-  listeners: any = [this.basketComponent, this.virtualJournalComponent];
+  initialBasket: Basket = {
+    basketStarted: false,
+    receiptNumber: 0,
+    cashierName: 'Ned Stark',
+    cashierId: 1234,
+    date: new Date(),
+    location: '',
+    voided: false,
+    lineItems: [],
+    subTotal: 0,
+    taxApplied: 0,
+    total: 0,
+  }
 
   basket!: Basket;
+
   totalAmount: boolean = false;
   readyForTender: boolean = false;
   disableButtons: boolean = false;
@@ -45,8 +54,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
-  returnObj: any = {};
-
   barcode: string = '';
   shouldVoid: boolean = false;
   toBeVoided!: LineItem;
@@ -59,10 +66,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   constructor (
     private http: HttpClient,
-    private eventsService: EventsService,
+    private registerService: RegisterService,
     private discountsService: DiscountsService
   ) {
-      this._serviceSubscription = this.eventsService.captureLineItem.subscribe({
+      this.registerService.captureLineItem.subscribe({
         next: (event: any) => {
           this.handleEvent(event.action, event.message, event.data);
         }
@@ -72,7 +79,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     localStorage.clear();
-    this.basket = this.basketComponent.getInitialBasketInfo();
+    this.basket = this.initialBasket;
 
     this.getCurrentPosition().subscribe({
       next: (position) => {
@@ -106,10 +113,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
         }
       }
     })
-  };
-
-  ngOnDestroy(): void {
-    this._serviceSubscription.unsubscribe();
   };
 
 // ============= These methods are called in ngOnInit() to get location and parse CSV pricebook file
@@ -147,7 +150,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 // ============= This is the event handler method
 public async handleEvent(eventAction: string, listenerMessage?: string, data?: any) {
   await this.self[`${eventAction}`](data);
-  this.eventsService.handleEvent.emit({
+  this.registerService.handleEvent.emit({
     basket: this.basket,
     message: listenerMessage,
     data: data
@@ -156,6 +159,9 @@ public async handleEvent(eventAction: string, listenerMessage?: string, data?: a
 // =============
 
 // ============= These are the methods that manipulate the basket
+  public getInitialBasket() {
+    return this.basket;
+  }
   public basketStarted() {
     this.basket.basketStarted = true;
     this.basket.receiptNumber = this.basket.receiptNumber + 1;
