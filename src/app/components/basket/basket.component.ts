@@ -33,8 +33,7 @@ export class BasketComponent implements OnInit, OnDestroy {
 
   basket!: Basket;
 
-  constructor(
-    private eventsService: EventsService) {
+  constructor( private eventsService: EventsService ) {
       this._serviceSubscription = this.eventsService.handleEvent.subscribe({
         next: (event: any) => {
           this.basket = event.basket;

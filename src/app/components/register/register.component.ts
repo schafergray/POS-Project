@@ -60,7 +60,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor (
     private http: HttpClient,
     private eventsService: EventsService,
-    private discountsService: DiscountsService) {
+    private discountsService: DiscountsService
+  ) {
       this._serviceSubscription = this.eventsService.captureLineItem.subscribe({
         next: (event: any) => {
           this.handleEvent(event.action, event.message, event.data);
