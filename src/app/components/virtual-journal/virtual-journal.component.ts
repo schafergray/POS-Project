@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RegisterService } from '../../services/register.service';
+import { RegisterBrokerService } from '../../services/register-broker.service';
 
 @Component({
   selector: 'app-virtual-journal',
@@ -12,7 +12,7 @@ export class VirtualJournalComponent {
   localStorageKey: number = 0
 
   constructor(
-    private registerService: RegisterService) {
+    private registerService: RegisterBrokerService) {
       this.registerService.handleEvent.subscribe({
         next: (event: any) => {
           this.localStorageKey = this.localStorageKey + 1;

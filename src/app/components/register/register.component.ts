@@ -7,9 +7,9 @@ import { Observable } from 'rxjs';
 import { ReceiptComponent } from '../receipt/receipt.component';
 import { Basket } from '../../models/basket';
 import { VirtualJournalComponent } from '../virtual-journal/virtual-journal.component';
-import { RegisterService } from '../../services/register.service';
+import { RegisterBrokerService } from '../../services/register-broker.service';
 import { DiscountsService } from '../../services/discounts.service';
-import { ReceiptService } from '../../services/receipt.service';
+import { ReceiptBrokerService } from '../../services/receipt-broker.service';
 
 @Component({
   selector: 'app-pos',
@@ -17,7 +17,7 @@ import { ReceiptService } from '../../services/receipt.service';
   imports: [CommonModule, ReceiptComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
-  providers: [RegisterService, DiscountsService]
+  providers: [RegisterBrokerService, DiscountsService]
 })
 export class RegisterComponent implements OnInit {
   self: any;
@@ -71,8 +71,8 @@ export class RegisterComponent implements OnInit {
 
   constructor (
     private http: HttpClient,
-    private registerService: RegisterService,
-    private receiptService: ReceiptService,
+    private registerService: RegisterBrokerService,
+    private receiptService: ReceiptBrokerService,
     private discountsService: DiscountsService
   ) {
       this.receiptService.captureLineItem.subscribe({

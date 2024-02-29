@@ -1,10 +1,10 @@
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LineItem } from '../../models/line-item';
 import { Basket } from '../../models/basket';
-import { RegisterService } from '../../services/register.service';
+import { RegisterBrokerService } from '../../services/register-broker.service';
 import RegisterComponent from '../register/register.component';
-import { ReceiptService } from '../../services/receipt.service';
+import { ReceiptBrokerService } from '../../services/receipt-broker.service';
 
 @Component({
   selector: 'app-receipt',
@@ -21,8 +21,8 @@ export class ReceiptComponent implements OnInit {
   registerBasket!: Basket;
 
   constructor(
-    private registerService: RegisterService,
-    private receiptService: ReceiptService,
+    private registerService: RegisterBrokerService,
+    private receiptService: ReceiptBrokerService,
     private register: RegisterComponent
     ) {
       this.registerService.handleEvent.subscribe({
